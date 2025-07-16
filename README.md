@@ -1,5 +1,5 @@
 # Early Stroke Diagnosis and Evaluation Based on Pathological Voice Classification Using Speech Enhancement
-This paper proposes a cascaded framework for early stroke diagnosis (ESD) combining speech enhancement (based on SEWUNet) and pathological voice recognition. It processes sustained vowels (SVs) with handcrafted features and machine learning algorithms, and spontaneous speech (SS) with mel-spectrogram features and a CNN-Transformer model. Clinical trials show that the two-stage strategy (SVs followed by SS) achieves 100% accuracy, demonstrating its potential as an assistive diagnostic tool.
+This paper proposes a cascaded framework for early stroke diagnosis (ESD) combining speech enhancement (based on SEWUNet) and pathological voice recognition. It processes sustained vowels (SVs) with handcrafted features and machine learning algorithms, and spontaneous speech (SS) with mel-spectrogram features and a CNN-Transformer model. Clinical trials conducted using self-built data from the paper showed that the two-stage strategy (SVs followed by SS) achieved an accuracy rate of 100%, demonstrating its potential as an auxiliary diagnostic tool.
 ## Requirements
 - Python==3.8.13
 - torch==1.12.1
@@ -10,17 +10,17 @@ This paper proposes a cascaded framework for early stroke diagnosis (ESD) combin
 ```
 ESPVC/
 ├── model_ss_sv/
-│ ├── ss_train.py 
-│ ├── sv_train.ipynb
-│ ├── pytorchtools.py
-│ ├── SerialNet.py
-│ ├── sparse_image_warp_pytorch.py
-│ ├── spec_augment_pytorch.py
+│ ├── ss_train.py # Loading, preprocessing, segmentation, and enhancement of spontaneous speech data
+│ ├── sv_train.ipynb # Loading, preprocessing, partitioning, and enhancement of sustained vowels data
+│ ├── pytorchtools.py # Tools for stopping training early
+│ ├── SerialNet.py # Two models, serial_cnn_transformer and serial_resnet_transformer, have been defined
+│ ├── sparse_image_warp_pytorch.py # Sparse image deformation implementation
+│ ├── spec_augment_pytorch.py # SpecAugment implementation
 ├── SEWUNet/
-│ ├── autoencoder_SEWUNet.ipynb
-│ ├── denoising_SEWUNet.ipynb
-│ ├── parts.py
-│ ├── utils.py
+│ ├── autoencoder_SEWUNet.ipynb # Construct and train a speech enhancement model (SEWUNet) based on an autoencoder
+│ ├── denoising_SEWUNet.ipynb # The main file, encompassing data loading, model definition, training, and validation processes
+│ ├── parts.py # The various components of the SEWUNet model are defined
+│ ├── utils.py # Includes auxiliary functions and custom classes
 ```
 ## Training
 ```
@@ -28,25 +28,3 @@ python ss_train.py
 python sv_train.py
 denoising_SEWUNet.py
 ```
-# Results
-1.The performance of the proposed AdaBoost model in SVs recognition.
-| Voice Type | Model |  Accuracy | Sensitivity | Specificity| F1-Score|
-| :---------: | :----: | :--------: | :----------: | :---------: | :------: |
-|     SVs    |AdaBoost|  92.31%  |    -        | -          | -       |
-
-2.The performance of the proposed CNN-Transformer model in SS recognition.
-| Voice Type | Model |  Accuracy | Sensitivity | Specificity| F1-Score|
-| :---------: | :----: | :--------: | :----------: | :---------: | :------: |
-|     SS     |	CNN-Transformer|  95.00%  |   95.37%    |   93.75%     | 95.37%    |
-|     SS     |ResNet-Transformer| 96.00%  |    96.30%   | 	94.79%     | 96.30%    |
-
-3.The evaluation of stroke recognition models before and after enhancement.
-| Voice Type | Model |  Accuracy | Sensitivity | Specificity| F1-Score|
-| :---------: | :----: | :--------: | :----------: | :---------: | :------: |
-|     Denoised SVs    |	AdaBoost|  91.97%  |   95.00%    |   86.75%    | 93.74%   |
-|     Denoised SS     |CNN-Transformer| 94.12%  |   96.30%     | 	91.67%    | 94.52%   |
-
-4.Test results of the two-stage strategy of SVs + SS.
-| Voice Type | Model |  Accuracy | Sensitivity | Specificity| F1-Score|
-| :---------: | :----: | :--------: | :----------: | :---------: | :------: |
-|   SVs+SS   |AdaBoost+CNN-Transformer|  100%  |    -        | -          | -       |
