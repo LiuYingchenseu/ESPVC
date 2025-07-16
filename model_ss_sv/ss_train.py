@@ -93,7 +93,7 @@ def get_melSpec(waveform, sample_rate=16000):
 
 
 #%% 
-#! 加载音频
+#! Load audio
 # speaker, gender, age
 # def extract_speaker_info(p):
     
@@ -122,7 +122,7 @@ def get_melSpec(waveform, sample_rate=16000):
 # # waveforms = []
 # # wave_labels = []
 # data = []
-# target_length = int(16000 * 2.5)    # 目标 2.5 秒
+# target_length = int(16000 * 2.5)    # Target: 2.5 seconds
 
 # for label, disorder in enumerate(os.listdir(data_root)):
 #     disorder_path = os.path.join(data_root, disorder)
@@ -152,7 +152,7 @@ def get_melSpec(waveform, sample_rate=16000):
 # df.to_csv('waveforms.csv', index=False)
 
 #%%
-#! 划分数据集
+#! Split the dataset
 
 df = pd.read_csv('waveforms.csv')
 
@@ -207,7 +207,7 @@ for i in range(5):
 
 
 #%%
-# 读取并使用其中一个折的数据
+# Read and utilize the data from one of the folds
 def paddingWave(waveform, target_length=int(16000 * 2.5)):
     if len(waveform) > target_length:
             waveform = waveform[:target_length]
@@ -231,7 +231,7 @@ waveform_age_valid = np.load('./waveform_age_valid_1.npy')
 X_train, X_valid, gender_train, age_train, y_train, y_valid, gender_valid, age_valid = [], [], [], [], [], [], [], []
 
 
-# 训练集时域数据增强
+# Time-domain data augmentation for training set
 for waveform, label, gender, age in zip(waveform_X_train, waveform_y_train, waveform_gender_train, waveform_age_train):
     na = NA_aug(samples=waveform, sample_rate=1600)
     na = paddingWave(na)
@@ -250,7 +250,7 @@ for waveform, label, gender, age in zip(waveform_X_train, waveform_y_train, wave
     gender_train.extend([gender] * 3)
     age_train.extend([age] * 3)
 
-# 训练集时频域数据增强
+# Time-frequency domain data augmentation for training set
 for waveform, label, gender, age in zip(waveform_X_train, waveform_y_train, waveform_gender_train, waveform_age_train):
     static, delta, delta2, masked_mel = get_melSpec(waveform)
     X_train.append(static)
@@ -262,7 +262,7 @@ for waveform, label, gender, age in zip(waveform_X_train, waveform_y_train, wave
     age_train.extend([age] * 2)
 
 
-# 验证集
+# Validation set
 for waveform, label, gender, age in zip(waveform_X_valid, waveform_y_valid, waveform_gender_valid, waveform_age_valid):
     na = NA_aug(samples=waveform, sample_rate=1600)
     na = paddingWave(na)
@@ -307,7 +307,7 @@ y_valid = np.array(y_valid)
 gender_valid = np.array(gender_valid)
 age_valid = np.array(age_valid)
 
-#! 标准化处理
+#! Standardization processing
 #### Scale the training data ####
 # store shape so we can transform it back 
 N,C,H,W = X_train.shape
@@ -315,7 +315,7 @@ N,C,H,W = X_train.shape
 # tell numpy to infer shape of 1D array with '-1' argument
 X_train = np.reshape(X_train, (N,-1)) 
 X_train = scaler.fit_transform(X_train)
-# 保存数据尺度参数
+# Save data scale parameters
 joblib.dump(scaler, "./scaler.pkl")
 # Transform back to NxCxHxW 4D tensor format
 X_train = np.reshape(X_train, (N,C,H,W))
@@ -328,10 +328,10 @@ X_valid = np.reshape(X_valid, (N,C,H,W))
 
 
 #%% 
-#! 模型训练
+#! model training
 from pytorchtools import EarlyStopping
 
-# 创建一个自定义的 Dataset 类，用于处理特征和标签数据
+# Create a custom Dataset class for handling feature and label data
 class StrokeDataset(Dataset):
     def __init__(self, X, y, gender, age):
         self.X = torch.tensor(X, dtype=torch.float).to(device)
@@ -356,7 +356,7 @@ batch_size = 16
 num_epochs = 100
 patience = 15
 
-# 创建 DataLoader 实例
+# Create a DataLoader instance
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 valid_loader = DataLoader(valid_dataset, batch_size=batch_size, shuffle=False)
 
